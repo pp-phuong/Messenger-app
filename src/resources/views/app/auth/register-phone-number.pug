@@ -1,0 +1,20 @@
+extends ../../layouts/sign
+
+block content
+  h5 Create account
+
+  form(action='/register-phone-number' method='POST')
+    .form-group.input-group-lg
+      input#firstNameRegisterEmail.form-control(type='text' name='firstName' placeholder='Firstname' required='' autofocus='')
+    .form-group.input-group-lg
+      input.form-control(type='text' placeholder='Lastname'  name='lastName'  required='')
+    .form-group.input-group-lg
+      input.form-control(type='number' placeholder='Phonenumber' name='phoneNumber'  required='')
+    .form-group.input-group-lg
+      input.form-control(type='password' placeholder='Password' name='password' required='')
+    .form-group.input-group-lg
+      #recaptcha-container
+    button#btnRegisterEmail.btn.btn-primary.btn-lg.btn-block Register
+    hr
+    p.text-muted Already have an account?
+    a.btn.btn-outline-light.btn-sm(href='/login') Sign in!
