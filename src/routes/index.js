@@ -1,12 +1,16 @@
 import express from 'express';
 import authRouter from '../app/Auth/Routes/routes';
+import Controller from '../app/Auth/Controllers/AuthController';
+import MiddleWare from '../app/Auth/Middleware/AuthMiddleware';
 
+const controller = new Controller();
+const middleWare = new MiddleWare();
 const router = express.Router();
 
 router.use(authRouter);
 
-router.get('/', (req, res) => res.redirect('/conversations'));
+router.get('/', middleWare.isLogin);
 
-router.get('/conversations', (req, res) => res.render('app/conversation/index'));
+router.get('/conversations', controller.view);
 
 export default router;
