@@ -1,0 +1,14 @@
+extends ../../layouts/sign
+
+block content
+  h5 Verified phone number
+
+  form(action='/verify-phone-number' method='POST')
+    .form-group.input-group-lg
+      input.form-control(type='number' placeholder='code' name='codeVerify'  required='')
+    .form-group.input-group-lg
+      #recaptcha-container
+    button#btnRegisterEmail.btn.btn-primary.btn-lg.btn-block Verified 
+    hr
+    p.text-muted Already have an account?
+    a.btn.btn-outline-light.btn-sm(href='/login') Sign in!

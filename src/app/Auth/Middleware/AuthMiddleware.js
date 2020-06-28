@@ -8,12 +8,24 @@ class AuthController extends BaseController {
     this.service = Service.getService();
   }
 
-  isLogin(req, res) {
+  isLogin(req, res, next) {
     const user = firebase.auth().currentUser;
+    console.log(firebase.auth().currentUser);
     if (user) {
-      res.redirect('/conversations');
+      next();
     } else {
-         return res.redirect('/login');
+     return res.redirect('/login');
+    }
+  }
+
+  isNotLogin(req, res, next) {
+    const user = firebase.auth().currentUser;
+    if (user == null) {
+      console.log(1);
+      next();
+    } else {
+      console.log(1);
+     return res.redirect('/conversations');
     }
   }
 }

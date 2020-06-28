@@ -13,7 +13,11 @@ class AuthController extends BaseController {
     return res.render('app/auth/register-email');
   }
 
-  view(req, res) {
+  viewLogin(req, res) {
+    return res.render('app/login');
+  }
+
+  viewConversation(req, res) {
     return res.render('app/conversation/index');
   }
 
@@ -23,75 +27,93 @@ class AuthController extends BaseController {
 
   async registerByEmail(req, res) {
     const {
- email, password, firstName, lastName,
-} = req.body;
-    // const user = { email, password };
-    // console.log(user);
-    // console.log(email.emailVerified);
+    email, password, firstName, lastName,
+    } = req.body;
     try {
-      //  if (email.emailVerified !== undefined) {
-      firebase.auth().createUserWithEmailAndPassword(email, password);
-      console.log('register successfull');
-      //  } else {
-      //    firebase.auth().currentUser.sendEmailVerification(email);
-      //    console.log('Sent verify email');
-      //  }
-    } catch (e) {
-      return res.json(e.message);
-    }
-    await knex('users').insert({
-      firstName,
-      lastName,
-      email,
-      password,
-    });
-    return res.redirect('/login');
-  }
-
-  async signInWithEmail(req, res) {
-    const { email, password } = req.body;
-    // try {
-    //   await firebase.auth().signInWithEmailAndPassword(email, password);
-    // } catch (error) {
-    //   if (error.code === 'auth/wrong-password') {
-    //     return res.status(400).json({ message: 'Wrong password' });
-    //   }
-    //   return res.status(400).json(error.message);
-    // }
-    // return res.redirect('/');
-    const user = firebase.auth().currentUser;
-   try {
-      if (user.emailVerified) {
-      firebase
+        await firebase
         .auth()
-        .signInWithEmailAndPassword(email, password);
-      } else {
-      user.sendEmailVerification();
-      }
-      return res.redirect('/');
-    } catch (e) {
-          console.log(e);
+        .createUserWithEmailAndPassword(email, password);
+          console.log('register successfull');
+           console.log('sent');
+          knex('users').insert({
+           firstName,
+           lastName,
+           email,
+           password,
+         });
+         firebase.auth().signOut();
+         res.redirect('/login');
+        } catch (error) {
+          res.json(error);
         }
-  }
+       }
 
-  async registerByPhoneNumber(req, res) {
+async registerByPhoneNumber(req, res) {
     const {
  phoneNumber, password, firstName, lastName,
 } = req.body;
-    firebase.auth().languageCode = 'it';
-    firebase.auth().useDeviceLanguage();
-
+    firebase.auth().signInWithPhoneNumber(phoneNumber)
+    .catch((error) => {
+      res.json(error);
+    });
     await knex('users').insert({
       firstName,
       lastName,
       phoneNumber,
       password,
     });
-    return res.redirect('/login');
+    return res.redirect('/verify-phone-number');
+  }
+
+ async verifyPhoneNumber(req, res) {
+   const { codeVerify } = req.body;
+   firebase.auth.ConfirmationResult.confirm(codeVerify)
+     .then((result) => {
+       // User signed in successfully.
+       const { user } = result;
+       // ...
+     })
+     .catch((error) => {
+       res.json(error);
+     });
+    const credential = firebase.auth.PhoneAuthProvider.credential(
+      codeVerify,
+    );
+    firebase.auth().signInWithCredential(credential);
+ }
+
+  async signInWithEmail(req, res) {
+    const { email, password } = req.body;
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      return res.status(400).json(error.message);
+    }
+    const user = firebase.auth().currentUser;
+    try {
+      if (user.emailVerified) {
+        res.redirect('/');
+      } else {
+        user.sendEmailVerification();
+         res.render('/app/auth/conversation/email-verified');
+      }
+    } catch (e) {
+      res.status(400).json(e.message);
+    }
   }
 
   async signInWithPhoneNumber(req, res) {
     res.redirect('/');
+  }
+
+  signOut(req, res) {
+    try {
+      firebase.auth().signOut();
+      console.log('out');
+      res.redirect('/login');
+    } catch (error) {
+        res.json(error.message);
+    }
   }
 }
 export default AuthController;
