@@ -1,4 +1,4 @@
-import firebase from '../../../database/firebase';
+import firebase from '../../../config/firebase';
 import BaseController from '../../../infrastructure/Controllers/BaseController';
 import Service from '../Services/AuthService';
 
@@ -10,7 +10,6 @@ class AuthController extends BaseController {
 
   isLogin(req, res, next) {
     const user = firebase.auth().currentUser;
-    console.log(firebase.auth().currentUser);
     if (user) {
       next();
     } else {
@@ -21,10 +20,8 @@ class AuthController extends BaseController {
   isNotLogin(req, res, next) {
     const user = firebase.auth().currentUser;
     if (user == null) {
-      console.log(1);
       next();
     } else {
-      console.log(1);
      return res.redirect('/conversations');
     }
   }

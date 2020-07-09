@@ -4,6 +4,7 @@ block content
   h5 Create account
 
   form(action='/register-email' method='POST')
+    p(style='color:red;')=msg
     .form-group.input-group-lg
       input#firstNameRegisterEmail.form-control(type='text' name='firstName' placeholder='Firstname' required='' autofocus='')
     .form-group.input-group-lg

@@ -4,6 +4,7 @@ block content
   h5 Verified phone number
 
   form(action='/verify-phone-number' method='POST')
+    p(style='color:red;')=msg
     .form-group.input-group-lg
       input.form-control(type='number' placeholder='code' name='codeVerify'  required='')
     .form-group.input-group-lg

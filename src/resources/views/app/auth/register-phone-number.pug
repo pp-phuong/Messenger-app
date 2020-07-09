@@ -3,18 +3,17 @@ extends ../../layouts/sign
 block content
   h5 Create account
 
-  form(action='/register-phone-number' method='POST')
-    .form-group.input-group-lg
-      input#firstNameRegisterEmail.form-control(type='text' name='firstName' placeholder='Firstname' required='' autofocus='')
-    .form-group.input-group-lg
-      input.form-control(type='text' placeholder='Lastname'  name='lastName'  required='')
-    .form-group.input-group-lg
+  form#getcodetologin(action='/register-phone-number' method='POST')
+    p(style='color:red;')=msg
+    #login_step_2.form-group.input-group-lg
       input.form-control(type='number' placeholder='Phonenumber' name='phoneNumber'  required='')
-    .form-group.input-group-lg
-      input.form-control(type='password' placeholder='Password' name='password' required='')
-    .form-group.input-group-lg
       #recaptcha-container
-    button#btnRegisterEmail.btn.btn-primary.btn-lg.btn-block Register
+      button#getcode.btn.btn-primary.btn-lg.btn-block Get code
+    hr
+    #login_step_1.form-group.input-group-lg(style="display:none")
+      input.form-control(type='text' placeholder='code' name='code'  required='')
+      button#verifycode.btn.btn-primary.btn-lg.btn-block Login
+    
     hr
     p.text-muted Already have an account?
     a.btn.btn-outline-light.btn-sm(href='/login') Sign in!

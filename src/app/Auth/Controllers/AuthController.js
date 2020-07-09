@@ -1,4 +1,4 @@
-import firebase from '../../../database/firebase';
+import firebase from '../../../config/firebase';
 import BaseController from '../../../infrastructure/Controllers/BaseController';
 import Service from '../Services/AuthService';
 import knex from '../../../database/connection';
@@ -10,11 +10,11 @@ class AuthController extends BaseController {
   }
 
   viewRegisterByEmail(req, res) {
-    return res.render('app/auth/register-email');
+    return res.render('app/auth/register-email', { msg: req.flash('msg') });
   }
 
   viewLogin(req, res) {
-    return res.render('app/login');
+    return res.render('app/login', { msg: req.flash('msg') });
   }
 
   viewConversation(req, res) {
@@ -22,7 +22,11 @@ class AuthController extends BaseController {
   }
 
   viewRegisterByPhoneNumber(req, res) {
-    return res.render('app/auth/register-phone-number');
+    return res.render('app/auth/register-phone-number', { msg: req.flash('msg') });
+  }
+
+  viewVerifyPhoneNumber(req, res) {
+    return res.render('/app/auth/verified-phone-number', { msg: req.flash('msg') });
   }
 
   async registerByEmail(req, res) {
@@ -33,18 +37,19 @@ class AuthController extends BaseController {
         await firebase
         .auth()
         .createUserWithEmailAndPassword(email, password);
-          console.log('register successfull');
-           console.log('sent');
           knex('users').insert({
            firstName,
            lastName,
            email,
            password,
          });
+         const user = firebase.auth().currentUser;
+          user.sendEmailVerification();
          firebase.auth().signOut();
-         res.redirect('/login');
+         res.render('app/auth/register-verify');
         } catch (error) {
-          res.json(error);
+            req.flash('msg', error.message);
+            return res.redirect('/register-email');
         }
        }
 
@@ -54,7 +59,7 @@ async registerByPhoneNumber(req, res) {
 } = req.body;
     firebase.auth().signInWithPhoneNumber(phoneNumber)
     .catch((error) => {
-      res.json(error);
+      req.flash('msg', error.message);
     });
     await knex('users').insert({
       firstName,
@@ -68,48 +73,44 @@ async registerByPhoneNumber(req, res) {
  async verifyPhoneNumber(req, res) {
    const { codeVerify } = req.body;
    firebase.auth.ConfirmationResult.confirm(codeVerify)
-     .then((result) => {
-       // User signed in successfully.
-       const { user } = result;
-       // ...
+     .then(() => {
+       const credential = firebase.auth.PhoneAuthProvider.credential(
+      codeVerify,
+      );
+      firebase.auth().signInWithCredential(credential);
+       res.redirect('/');
      })
      .catch((error) => {
-       res.json(error);
+       req.flash('msg', error.message);
+       res.redirect('/login');
      });
-    const credential = firebase.auth.PhoneAuthProvider.credential(
-      codeVerify,
-    );
-    firebase.auth().signInWithCredential(credential);
  }
 
   async signInWithEmail(req, res) {
     const { email, password } = req.body;
     try {
       await firebase.auth().signInWithEmailAndPassword(email, password);
-    } catch (error) {
-      return res.status(400).json(error.message);
-    }
-    const user = firebase.auth().currentUser;
-    try {
+      const user = firebase.auth().currentUser;
       if (user.emailVerified) {
         res.redirect('/');
       } else {
-        user.sendEmailVerification();
-         res.render('/app/auth/conversation/email-verified');
+         firebase.auth().signOut();
+        req.flash('msg', 'Please verify your email to login !');
+        res.redirect('/login');
       }
-    } catch (e) {
-      res.status(400).json(e.message);
+    } catch (error) {
+     req.flash('msg', error.message);
+     return res.redirect('/login');
     }
   }
 
   async signInWithPhoneNumber(req, res) {
-    res.redirect('/');
+    res.redirect('/verify-phone-number');
   }
 
   signOut(req, res) {
     try {
       firebase.auth().signOut();
-      console.log('out');
       res.redirect('/login');
     } catch (error) {
         res.json(error.message);

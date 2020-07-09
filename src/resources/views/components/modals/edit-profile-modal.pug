@@ -17,7 +17,7 @@
               a.nav-link(data-toggle='tab' href='#social-links' role='tab' aria-controls='social-links' aria-selected='false') Social Links
           .tab-content
             #personal.tab-pane.show.active(role='tabpanel')
-              form
+              form(action='/edit-profile' method='POST')
                 .form-group
                   label.col-form-label(for='fullname') Fullname
                   .input-group
@@ -55,6 +55,7 @@
                       span.input-group-text
                         i.ti-link
                     input#website.form-control(type='text')
+              input.btn.btn-primary(type="submit" value="Save")
             #about.tab-pane(role='tabpanel')
               form(action='')
                 .form-group
@@ -115,5 +116,5 @@
                       span.input-group-text.bg-whatsapp
                         i.fa.fa-whatsapp
                     input.form-control(type='text' placeholder='Username')
-        .modal-footer
-          button.btn.btn-primary(type='button') Save
+        //- .modal-footer
+        //-   button.btn.btn-primary(type='button') Save

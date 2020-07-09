@@ -9,9 +9,6 @@ const middleware = new MiddleWare();
 router.get('/login', middleware.isNotLogin, controller.viewLogin);
 
 router.post('/login', controller.callMethod('signInWithEmail'));
-router.route('/login-phone-number')
-  .get(controller.viewRegisterByPhoneNumber)
-  .post(controller.signInWithPhoneNumber);
 router.post('/signout', controller.signOut);
 router.get('/register', middleware.isNotLogin, (req, res) => res.render('app/auth/register'));
 
@@ -29,5 +26,6 @@ router.get(
 );
 router.post('/register-phone-number', controller.registerByPhoneNumber);
 router.post('/verify-phone-number', controller.verifyPhoneNumber);
+router.get('/verify-phone-number', controller.viewVerifyPhoneNumber);
 router.get('/reset-password', (req, res) => res.render('app/view-reset-password'));
 export default router;

@@ -1,4 +1,6 @@
 import methodOverride from 'method-override';
+import flash from 'connect-flash';
+import session from 'express-session';
 import routes from '../routes/index';
 
 export default function (app) {
@@ -31,5 +33,13 @@ export default function (app) {
     next();
   });
 
+  app.use(session({
+ cookie: { maxAge: 60000 },
+                  secret: 'woot',
+                  resave: false,
+                  saveUninitialized: false,
+}));
+
+  app.use(flash());
   app.use(routes);
 }
