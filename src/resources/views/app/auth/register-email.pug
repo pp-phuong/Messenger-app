@@ -3,19 +3,19 @@ extends ../../layouts/sign
 block content
   h5 Create account
 
-  form(action='/register-email' method='POST')
+  form#emailRegister
     p(style='color:red;')=msg
     .form-group.input-group-lg
-      input#firstNameRegisterEmail.form-control(type='text' name='firstName' placeholder='Firstname' required='' autofocus='')
+      input#firstName.form-control(type='text' name='firstName' placeholder='Firstname' required='' autofocus='')
     .form-group.input-group-lg
-      input.form-control(type='text' placeholder='Lastname'  name='lastName'  required='')
+      input#lastName.form-control(type='text' placeholder='Lastname'  name='lastName'  required='')
     .form-group.input-group-lg
-      input.form-control(type='email' placeholder='Email' name='email'  required='')
+      input#email.form-control(type='email' placeholder='Email' name='email'  required='')
     .form-group.input-group-lg
-      input.form-control(type='password' placeholder='Password' name='password' required='')
+      input#pwd.form-control(type='password' placeholder='Password' name='password' required='')
     .form-group.input-group-lg
       #recaptcha-container
-    button#btnRegisterEmail.btn.btn-primary.btn-lg.btn-block Register
+    button.btn.btn-primary.btn-lg.btn-block(type="submit") Register
     hr
     p.text-muted Already have an account?
     a.btn.btn-outline-light.btn-sm(href='/login') Sign in!

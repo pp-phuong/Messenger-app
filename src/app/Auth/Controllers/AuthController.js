@@ -1,7 +1,6 @@
 import firebase from '../../../config/firebase';
 import BaseController from '../../../infrastructure/Controllers/BaseController';
 import Service from '../Services/AuthService';
-import knex from '../../../database/connection';
 
 class AuthController extends BaseController {
   constructor() {
@@ -29,45 +28,23 @@ class AuthController extends BaseController {
     return res.render('/app/auth/verified-phone-number', { msg: req.flash('msg') });
   }
 
-  async registerByEmail(req, res) {
-    const {
-    email, password, firstName, lastName,
-    } = req.body;
-    try {
-        await firebase
-        .auth()
-        .createUserWithEmailAndPassword(email, password);
-          knex('users').insert({
-           firstName,
-           lastName,
-           email,
-           password,
-         });
-         const user = firebase.auth().currentUser;
-          user.sendEmailVerification();
-         firebase.auth().signOut();
-         res.render('app/auth/register-verify');
-        } catch (error) {
-            req.flash('msg', error.message);
-            return res.redirect('/register-email');
-        }
-       }
+  viewVerifyEmail(req, res) {
+    return res.render('/app/auth/register-verify');
+  }
 
-async registerByPhoneNumber(req, res) {
+  async registerByEmail(req) {
+    const {
+    email, pwd,
+    } = req.body;
+    console.log('step2');
+    return this.service.registerByEmail(email, pwd);
+  }
+
+async registerByPhoneNumber(req) {
     const {
  phoneNumber, password, firstName, lastName,
 } = req.body;
-    firebase.auth().signInWithPhoneNumber(phoneNumber)
-    .catch((error) => {
-      req.flash('msg', error.message);
-    });
-    await knex('users').insert({
-      firstName,
-      lastName,
-      phoneNumber,
-      password,
-    });
-    return res.redirect('/verify-phone-number');
+  return this.service.registerByPhoneNumber(phoneNumber, password, firstName, lastName);
   }
 
  async verifyPhoneNumber(req, res) {
@@ -86,26 +63,14 @@ async registerByPhoneNumber(req, res) {
      });
  }
 
-  async signInWithEmail(req, res) {
+  async signInWithEmail(req) {
     const { email, password } = req.body;
-    try {
-      await firebase.auth().signInWithEmailAndPassword(email, password);
-      const user = firebase.auth().currentUser;
-      if (user.emailVerified) {
-        res.redirect('/');
-      } else {
-         firebase.auth().signOut();
-        req.flash('msg', 'Please verify your email to login !');
-        res.redirect('/login');
-      }
-    } catch (error) {
-     req.flash('msg', error.message);
-     return res.redirect('/login');
-    }
+    return this.service.signInWithEmail(email, password);
   }
 
   async signInWithPhoneNumber(req, res) {
-    res.redirect('/verify-phone-number');
+    const { phoneNumber, pwd } = req.body;
+    return this.service.signInWithPhoneNumber(phoneNumber, pwd);
   }
 
   signOut(req, res) {
@@ -117,4 +82,5 @@ async registerByPhoneNumber(req, res) {
     }
   }
 }
+
 export default AuthController;
