@@ -10,6 +10,7 @@ class AuthController extends BaseController {
 
   isLogin(req, res, next) {
     const user = firebase.auth().currentUser;
+    // console.log(user);
     if (user) {
       next();
     } else {

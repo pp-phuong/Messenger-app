@@ -6,7 +6,7 @@ import MiddleWare from '../Middleware/AuthMiddleware';
 const router = express.Router();
 const controller = new Controller();
 const middleware = new MiddleWare();
-router.get('/login', controller.viewLogin);
+router.get('/login', middleware.isNotLogin, controller.viewLogin);
 router.get('/register', middleware.isNotLogin, (req, res) => res.render('app/auth/register'));
 router.get(
   '/register-email',
@@ -25,12 +25,9 @@ router.get('/reset-password', (req, res) => res.render('app/view-reset-password'
 router.post('/auth/login-email', controller.callMethod('signInWithEmail'));
 router.post('/signout', controller.signOut);
 
-
 router.post('/auth/register-email', controller.callMethod('registerByEmail'));
-router.post('/verify-email', controller.callMethod('verifyEmail'));
 
-
-router.post('/register-phone-number', controller.registerByPhoneNumber);
-router.post('/verify-phone-number', controller.verifyPhoneNumber);
+router.post('/auth/register-phone-number', controller.registerByPhoneNumber);
+// router.post('/verify-phone-number', controller.verifyPhoneNumber);
 
 export default router;

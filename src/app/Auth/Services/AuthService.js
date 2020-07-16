@@ -16,17 +16,18 @@ class AuthService {
     return this.service;
   }
 
-  signInWithEmail(email, password) {
-    return this.repository.signInWithEmail(email, password);
+  async signInWithEmail(email, password) {
+    await this.repository.signInWithEmail(email, password);
   }
 
-  registerByEmail(email, pwd) {
-    bcrypt.hash(pwd, saltRounds, async (err, hashPwd) => 
-    this.repository.registerByEmail(email, hashPwd));
+  async registerByEmail(email, pwd) {
+    bcrypt.hash(pwd, saltRounds, async (err, hashPwd) => {
+      await this.repository.registerByEmail(email, hashPwd);
+    });
   }
 
-  signInWithPhoneNumber(phoneNumber, pwd) {
-    return this.repository.signInWithPhoneNumber(phoneNumber, pwd);
+  async signInWithPhoneNumber(phoneNumber, pwd) {
+    await this.repository.signInWithPhoneNumber(phoneNumber, pwd);
   }
 }
 

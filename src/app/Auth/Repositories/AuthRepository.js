@@ -1,6 +1,6 @@
-import firebase from '../../../config/firebase';
+import bcrypt from 'bcrypt';
 import BaseRepository from '../../../infrastructure/Repositories/BaseRepository';
-// import knexfile from '../../../../knexfile';
+import knex from '../../../database/connection';
 
 class AuthRepository extends BaseRepository {
   static repository;
@@ -17,36 +17,43 @@ class AuthRepository extends BaseRepository {
     return 'users';
   }
 
-  async signInWithEmail(email, password, res) {
-    const user = this.listBy('email');
-    if (user.password === password) {
-      firebase.auth().signInWithEmailAndPassword(email, password);
-    }
-    const data = { email, password };
-    console.log(data);
-    return res.json({
-      message: data,
+  // json-webtoken npm
+  async signInWithEmail(email, password) {
+    const user = await knex('users')
+      .where({
+        email,
+      })
+      .first();
+    console.log(user);
+    if (user === undefined) throw new Error('Email is not exist');
+    else {
+  bcrypt.compare(password, user.password, (err, result) => {
+      if (!result) {
+        throw new Error('Wrong password ! ');
+      }
     });
+    }
+    console.log('done');
   }
 
-  async registerByEMail(req, res, email, pwd) {
-    const user = this.listBy('email');
-    if (!user) {
-      this.create({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
+  async registerByEmail(email, hashedPwd) {
+   const user = await knex('users')
+     .where({
+       email,
+     })
+     .first();
+    if (user === undefined) {
+      await this.create({
         email,
-        pwd,
+        password: hashedPwd,
       });
-      console.log('done');
-      return res.json({
-        message: 'create user success',
-      });
+    } else {
+      throw new Error('Email already in use');
     }
   }
 
   async signInWithPhoneNumber(phoneNumber, pwd) {
-    const user = this.listBy('phone-number');
+    const user = await this.listBy('phone-number');
     console.log(user);
     console.log(phoneNumber + pwd);
   }
